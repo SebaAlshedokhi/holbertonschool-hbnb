@@ -63,7 +63,42 @@ HBnB Evolution is based on a **three-layer architecture**:
 ---
 
 ### 2.2 High-Level Package Diagram 🗂️
-(Here goes the High-Level Package Diagram)
+
+```mermaid
+classDiagram
+    class API {
+        <<Presentation>>
+    }
+    class Services {
+        <<Presentation>>
+    }
+    class HBNBFacade {
+        <<Facade>>
+    }
+    class Repository {
+        <<Persistence>>
+    }
+    class Database {
+        <<Persistence>>
+    }
+    class User {
+        <<Model>>
+    }
+    class Place {
+        <<Model>>
+    }
+    class Review {
+        <<Model>>
+    }
+    class Amenity {
+        <<Model>>
+    }
+
+    API --> HBNBFacade : Facade Pattern
+    Services --> HBNBFacade : Facade Pattern
+    HBNBFacade --> Repository : CRUD Operations
+    Repository --> Database : stores data
+```
 
 **Notes 💡**  
 - The **Presentation Layer** communicates only through the Facade.  
@@ -73,7 +108,15 @@ HBnB Evolution is based on a **three-layer architecture**:
 ---
 
 ### 2.3 Layer Data Flow 🔄
-(Here goes the Layer Data Flow diagram)
+```mermaid
+flowchart LR
+    User -->|HTTP Request| API
+    API -->|Facade call| HBNBFacade
+    HBNBFacade -->|CRUD ops| Repository
+    Repository -->|SQL queries| Database
+    Database --> Repository --> HBNBFacade --> API --> User
+
+```
 
 **Explanation:**  
 - Requests flow top-down: User → API → Facade → Repository → Database  
@@ -99,7 +142,63 @@ Core entities:
 ---
 
 ### 3.2 Class Diagram 📊
-(Here goes the Class Diagram for Business Logic Layer)
+```mermaid
+classDiagram
+  class BaseEntity {
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+  }
+
+  class User {
+    +string first_name
+    +string last_name
+    +string email
+    +string password
+    +boolean is_admin
+    +create()
+    +update()
+    +delete()
+  }
+
+  class Place {
+    +string title
+    +string description
+    +float price
+    +float latitude
+    +float longitude
+    +create()
+    +update()
+    +delete()
+  }
+
+  class Review {
+    +int rating
+    +string comment
+    +create()
+    +update()
+    +delete()
+  }
+
+  class Amenity {
+    +string name
+    +string description
+    +create()
+    +update()
+    +delete()
+  }
+
+  BaseEntity <|-- User
+  BaseEntity <|-- Place
+  BaseEntity <|-- Review
+  BaseEntity <|-- Amenity
+
+  User "1" o-- "many" Place : owns
+  User "1" o-- "many" Review : writes
+  Place "1" o-- "many" Review : has
+  Place "1" o-- "many" Amenity : includes
+
+```
 
 ---
 
@@ -124,7 +223,28 @@ Core entities:
 ## 4. API Interaction Flow – Sequence Diagrams
 
 ### 4.1 User Registration 📝
-(Here goes the Sequence Diagram for User Registration)
+```mermaid
+sequenceDiagram
+    actor User
+    participant API as API Service
+    participant BL as Business Logic
+    participant DB as Database
+
+    User->>API: Create User
+    API->>BL: create_user()
+    BL->>BL: Validate user data
+
+    alt User data valid
+        BL->>DB: Save user data
+        DB-->>BL: User created confirmation
+        BL-->>API: User create successful
+        API-->>User: HTTP 201 Created
+    else User data invalid
+        BL-->>API: Invalid user data request
+        API-->>User: HTTP 400 Bad Request
+    end
+
+```
 
 **Notes:**  
 - Validation ensures email format, password strength  
@@ -133,7 +253,29 @@ Core entities:
 ---
 
 ### 4.2 Place Creation 🏡
-(Here goes the Sequence Diagram for Place Creation)
+```mermai
+sequenceDiagram
+    actor User
+    participant API as API Service
+    participant BL as Business Logic
+    participant DB as Database
+
+    User->>API: Create listing request
+    API->>BL: create_listing(data)
+    BL->>BL: Validate listing data
+
+    alt Listing data valid
+        BL->>DB: Save listing
+        DB-->>BL: Listing save confirmation
+        BL-->>API: Listing create successful
+        API-->>User: HTTP 201 Created
+    else Listing data invalid
+        BL-->>API: Invalid data error
+        API-->>User: HTTP 400 Bad Request
+    end
+
+
+```
 
 **Notes:**  
 - Validates listing data before saving  
@@ -142,7 +284,29 @@ Core entities:
 ---
 
 ### 4.3 Review Submission ✍️
-(Here goes the Sequence Diagram for Review Submission)
+```mermaid
+sequenceDiagram
+    actor User
+    participant API as API Service
+    participant BL as Business Logic
+    participant DB as Database
+
+    User->>API: Review Submission
+    API->>BL: post_review()
+    BL->>BL: Validate review data
+
+    alt Review submission valid
+        BL->>DB: Save Review
+        DB-->>BL: Review stored confirmation
+        BL-->>API: Review posted successful
+        API-->>User: HTTP 201 Created
+    else Review submission invalid
+        BL-->>API: Review not valid
+        API-->>User: HTTP 400 Bad Request
+    end
+
+
+```
 
 **Notes:**  
 - Allows users to submit feedback only for valid places  
@@ -151,7 +315,22 @@ Core entities:
 ---
 
 ### 4.4 Fetching a List of Places 📋
-(Here goes the Sequence Diagram for Fetching Places)
+```mermaid
+sequenceDiagram
+    actor User
+    participant API as API Service
+    participant BL as Business Logic
+    participant DB as Database
+
+    User->>API: Fetch place list request
+    API->>BL: getPlaces()
+    BL->>DB: Query all listings
+    DB-->>BL: Return list of listings
+    BL-->>API: Return place list
+    API-->>User: HTTP 200 OK
+
+
+```
 
 **Notes:**  
 - Supports optional filters for price, location, amenities  
