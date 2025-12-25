@@ -1,4 +1,8 @@
-'''mermaid
+# HBnB System Architecture
+
+هذا المخطط يوضح الطبقات المختلفة في نظام HBnB وكيفية تواصلها باستخدام **Facade Pattern**.
+
+```mermaid
 classDiagram
     %% Presentation Layer
     class API {
