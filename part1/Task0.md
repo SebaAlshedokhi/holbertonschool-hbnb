@@ -1,51 +1,44 @@
-# HBnB System Architecture
+# HBnB Evolution - High-Level Architecture
 
-هذا المخطط يوضح الطبقات المختلفة في نظام HBnB وكيفية تواصلها باستخدام **Facade Pattern**.
+This file shows the three layers in HBnB Evolution and the connection between them via **Facade Pattern**.
 
 ```mermaid
 classDiagram
+    %% =======================
     %% Presentation Layer
+    %% =======================
     class API {
         <<Presentation>>
+        %% Handles user requests via endpoints
     }
     class Services {
         <<Presentation>>
+        %% Provides service logic for API
     }
 
+    %% =======================
     %% Business Logic Layer
+    %% =======================
     class HBNBFacade {
         <<Facade>>
-        +createUser()
-        +getUser()
-        +updateUser()
-        +deleteUser()
-        +createPlace()
-        +getPlace()
-        +updatePlace()
-        +deletePlace()
-        +createReview()
-        +getReview()
-        +updateReview()
-        +deleteReview()
-        +createAmenity()
-        +getAmenity()
-        +updateAmenity()
-        +deleteAmenity()
+        %% Unified interface to interact with models
     }
 
+    %% =======================
     %% Persistence Layer
+    %% =======================
     class Repository {
         <<Persistence>>
-        +save()
-        +get()
-        +update()
-        +delete()
+        %% Manages data operations
     }
     class Database {
         <<Persistence>>
+        %% Stores application data
     }
 
+    %% =======================
     %% Models
+    %% =======================
     class User {
         <<Model>>
     }
@@ -59,12 +52,10 @@ classDiagram
         <<Model>>
     }
 
+    %% =======================
     %% Relationships
+    %% =======================
     API --> HBNBFacade : Uses Facade
     Services --> HBNBFacade : Uses Facade
-    HBNBFacade --> Repository : CRUD Operations
+    HBNBFacade --> Repository : Interacts With
     Repository --> Database : Stores Data
-    Repository --> User : CRUD
-    Repository --> Place : CRUD
-    Repository --> Review : CRUD
-    Repository --> Amenity : CRUD
