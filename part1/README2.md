@@ -66,21 +66,41 @@ HBnB Evolution is based on a **three-layer architecture**:
 
 ```mermaid
 classDiagram
+    %% =======================
+    %% Presentation Layer
+    %% =======================
     class API {
         <<Presentation>>
+        %% Handles user requests via endpoints
     }
     class Services {
         <<Presentation>>
+        %% Provides service logic for API
     }
+
+    %% =======================
+    %% Business Logic Layer
+    %% =======================
     class HBNBFacade {
         <<Facade>>
+        %% Unified interface to interact with models
     }
+
+    %% =======================
+    %% Persistence Layer
+    %% =======================
     class Repository {
         <<Persistence>>
+        %% Manages data operations for models
     }
     class Database {
         <<Persistence>>
+        %% Stores application data
     }
+
+    %% =======================
+    %% Models
+    %% =======================
     class User {
         <<Model>>
     }
@@ -94,10 +114,78 @@ classDiagram
         <<Model>>
     }
 
-    API --> HBNBFacade : Facade Pattern
-    Services --> HBNBFacade : Facade Pattern
-    HBNBFacade --> Repository : CRUD Operations
-    Repository --> Database : stores data
+    %% =======================
+    %% Relationships
+    %% =======================
+    API --> HBNBFacade : Uses Facade
+    Services --> HBNBFacade : Uses Facade
+    HBNBFacade --> Repository : Interacts With
+    Repository --> Database : Stores Data
+
+    %% Models connected to Repository
+    Repository --> User : Manages
+    Repository --> Place : Manages
+    Repository --> Review : Manages
+    Repository --> Amenity : Manages
+
+```mermaid
+classDiagram
+    %% =======================
+    %% Presentation Layer
+    %% =======================
+    class API {
+        <<Presentation>>
+        %% Handles user requests via endpoints
+    }
+    class Services {
+        <<Presentation>>
+        %% Provides service logic for API
+    }
+
+    %% =======================
+    %% Business Logic Layer
+    %% =======================
+    class HBNBFacade {
+        <<Facade>>
+        %% Unified interface to interact with models
+    }
+
+    %% =======================
+    %% Persistence Layer
+    %% =======================
+    class Repository {
+        <<Persistence>>
+        %% Manages data operations
+    }
+    class Database {
+        <<Persistence>>
+        %% Stores application data
+    }
+
+    %% =======================
+    %% Models
+    %% =======================
+    class User {
+        <<Model>>
+    }
+    class Place {
+        <<Model>>
+    }
+    class Review {
+        <<Model>>
+    }
+    class Amenity {
+        <<Model>>
+    }
+
+    %% =======================
+    %% Relationships
+    %% =======================
+    API --> HBNBFacade : Uses Facade
+    Services --> HBNBFacade : Uses Facade
+    HBNBFacade --> Repository : Interacts With
+    Repository --> Database : Stores Data
+
 ```
 
 **Notes 💡**  
@@ -253,7 +341,8 @@ sequenceDiagram
 ---
 
 ### 4.2 Place Creation 🏡
-```mermai
+```mermaid
+
 sequenceDiagram
     actor User
     participant API as API Service
