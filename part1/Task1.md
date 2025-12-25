@@ -1,74 +1,73 @@
-# HBnB Evolution - Business Logic Layer Class Diagram
+# HBnB Evolution - Technical Documentation
+
+This document provides a complete overview of the HBnB Evolution application's architecture and business logic.
+
+---
+
+## 1. High-Level Package Diagram
+
+This diagram illustrates the three-layer architecture (Presentation, Business Logic, Persistence) and how the layers communicate using the **Facade Pattern**.
 
 ```mermaid
 classDiagram
     %% =======================
-    %% User Class
+    %% Presentation Layer
+    %% =======================
+    class API {
+        <<Presentation>>
+        %% Handles user requests via endpoints
+    }
+    class Services {
+        <<Presentation>>
+        %% Provides service logic for API
+    }
+
+    %% =======================
+    %% Business Logic Layer
+    %% =======================
+    class HBNBFacade {
+        <<Facade>>
+        %% Unified interface to interact with models
+    }
+
+    %% =======================
+    %% Persistence Layer
+    %% =======================
+    class Repository {
+        <<Persistence>>
+        %% Manages data operations for models
+    }
+    class Database {
+        <<Persistence>>
+        %% Stores application data
+    }
+
+    %% =======================
+    %% Models
     %% =======================
     class User {
-        +UUID id
-        +String first_name
-        +String last_name
-        +String email
-        +String password
-        +Boolean is_admin
-        +DateTime created_at
-        +DateTime updated_at
-        +register()
-        +update_profile()
-        +delete_account()
+        <<Model>>
     }
-
-    %% =======================
-    %% Place Class
-    %% =======================
     class Place {
-        +UUID id
-        +String title
-        +String description
-        +Float price
-        +Float latitude
-        +Float longitude
-        +DateTime created_at
-        +DateTime updated_at
-        +add_amenity(amenity)
-        +remove_amenity(amenity)
-        +update_details()
-        +delete_place()
+        <<Model>>
     }
-
-    %% =======================
-    %% Review Class
-    %% =======================
     class Review {
-        +UUID id
-        +UUID place_id
-        +UUID user_id
-        +Integer rating
-        +String comment
-        +DateTime created_at
-        +DateTime updated_at
-        +update_review()
-        +delete_review()
+        <<Model>>
     }
-
-    %% =======================
-    %% Amenity Class
-    %% =======================
     class Amenity {
-        +UUID id
-        +String name
-        +String description
-        +DateTime created_at
-        +DateTime updated_at
-        +update_amenity()
-        +delete_amenity()
+        <<Model>>
     }
 
     %% =======================
     %% Relationships
     %% =======================
-    User "1" -- "0..*" Place : owns
-    Place "1" -- "0..*" Review : has
-    User "1" -- "0..*" Review : writes
-    Place "0..*" -- "0..*" Amenity : includes
+    API --> HBNBFacade : Uses Facade
+    Services --> HBNBFacade : Uses Facade
+    HBNBFacade --> Repository : Interacts With
+    Repository --> Database : Stores Data
+
+    %% Models connected to Repository
+    Repository --> User : Manages
+    Repository --> Place : Manages
+    Repository --> Review : Manages
+    Repository --> Amenity : Manages
