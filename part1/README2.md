@@ -5,7 +5,6 @@
 2. [High-Level Architecture](#2-high-level-architecture)  
    - 2.1 Architectural Overview  
    - 2.2 High-Level Package Diagram  
-   - 2.3 Layer Data Flow  
 3. [Business Logic Layer – Class Diagram](#3-business-logic-layer--class-diagram)  
    - 3.1 Overview  
    - 3.2 Class Diagram  
@@ -192,24 +191,6 @@ classDiagram
 - The **Presentation Layer** communicates only through the Facade.  
 - The **Business Logic Layer** coordinates operations and delegates persistence tasks.  
 - The **Persistence Layer** is independent of the Presentation Layer.  
-
----
-
-### 2.3 Layer Data Flow 🔄
-```mermaid
-flowchart LR
-    User -->|HTTP Request| API
-    API -->|Facade call| HBNBFacade
-    HBNBFacade -->|CRUD ops| Repository
-    Repository -->|SQL queries| Database
-    Database --> Repository --> HBNBFacade --> API --> User
-
-```
-
-**Explanation:**  
-- Requests flow top-down: User → API → Facade → Repository → Database  
-- Responses flow bottom-up with status codes and data  
-- Facade centralizes calls and hides business complexity  
 
 ---
 
