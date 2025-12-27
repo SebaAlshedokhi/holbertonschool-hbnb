@@ -115,7 +115,7 @@ Understand layered architectures and design patterns
 Create UML-based technical documentation
 
 ---
-## Releavnce to Software Engineering :
+## Relevance to Software Engineering :
 This project applies industry-standard architectural patterns used in backend and service-oriented systems, 
 emphasizing modularity, maintainability, and iterative software development.
 
