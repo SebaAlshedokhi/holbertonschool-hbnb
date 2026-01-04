@@ -278,7 +278,7 @@ classDiagram
 
 | Class  | Purpose | Notes |
 |--------|---------|-------|
-| BaseEntity | Base for all entities | Provides `id`, `created_at`, `updated_at` |
+| BaseModel | Base for all entities | Provides `id`, `created_at`, `updated_at` |
 | User | Platform user | Supports authentication; owns listings & reviews |
 | Place | Property listing | Linked to User and Amenities; contains CRUD methods |
 | Review | Feedback on Place | Connected to User and Place; rating & comment fields |
