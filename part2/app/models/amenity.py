@@ -1,7 +1,7 @@
 from app.models.BaseEntity import BaseModel
 
 
-class User(BaseModel):
+class Amenity(BaseModel):
     def __init__(self, name, places):
         super().__init__()
 
