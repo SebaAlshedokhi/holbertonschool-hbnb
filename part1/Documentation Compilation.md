@@ -213,7 +213,7 @@ Core entities:
 ### 3.2 Class Diagram 📊
 ```mermaid
 classDiagram
-  class BaseEntity {
+  class BaseModel {
     +UUID id
     +datetime created_at
     +datetime updated_at
