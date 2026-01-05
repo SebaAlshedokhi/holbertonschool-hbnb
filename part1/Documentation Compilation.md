@@ -60,7 +60,6 @@ HBnB Evolution is based on a **three-layer architecture**:
 - Encapsulates multiple operations (CRUD, validation) in one point of access  
 
 ---
-
 ### 2.2 High-Level Package Diagram 🗂️
 
 ```mermaid
@@ -69,11 +68,11 @@ classDiagram
     %% Presentation Layer
     %% =======================
     class API {
-        <<Presentation>>
+        <<Layer>>
         %% Handles user requests via endpoints
     }
     class Services {
-        <<Presentation>>
+        <<Layer>>
         %% Provides service logic for API
     }
 
@@ -81,19 +80,20 @@ classDiagram
     %% Business Logic Layer
     %% =======================
     class BusinessLogicLayer {
-        <<Facade>>
-        %% Unified interface to interact with models
+        <<Layer>>
+    +Domain Models
+    +Business Rules
     }
 
     %% =======================
     %% Persistence Layer
     %% =======================
     class Repository {
-        <<Persistence>>
+        <<Layer>>
         %% Manages data operations for models
     }
     class Database {
-        <<Persistence>>
+        <<Layer>>
         %% Stores application data
     }
 
@@ -180,8 +180,8 @@ classDiagram
     %% =======================
     %% Relationships
     %% =======================
-    API --> HBNBFacade : Uses Facade
-    Services --> HBNBFacade : Uses Facade
+    API --> BusinessLogicLayer : Uses Facade
+    Services --> BusinessLogicLayer : Uses Facade
     HBNBFacade --> Repository : Interacts With
     Repository --> Database : Stores Data
 
