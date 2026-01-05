@@ -116,8 +116,8 @@ classDiagram
     %% =======================
     %% Relationships
     %% =======================
-    API --> HBNBFacade : Uses Facade
-    Services --> HBNBFacade : Uses Facade
+    API --> Business Logic Layer (includes Models) : Uses Facade
+    Services --> Business Logic Layer (includes Models) : Uses Facade
     HBNBFacade --> Repository : Interacts With
     Repository --> Database : Stores Data
 
