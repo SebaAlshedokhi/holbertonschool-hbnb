@@ -69,19 +69,31 @@ classDiagram
     %% =======================
     class API {
         <<Presentation>>
-        %% Handles user requests via endpoints
     }
     class Services {
         <<Presentation>>
-        %% Provides service logic for API
     }
 
     %% =======================
     %% Business Logic Layer
     %% =======================
-    class HBNBFacade {
-        <<Facade>>
-        %% Unified interface to interact with models
+    package "Business Logic Layer" {
+        class HBNBFacade {
+            <<Facade>>
+        }
+
+        class User {
+            <<Model>>
+        }
+        class Place {
+            <<Model>>
+        }
+        class Review {
+            <<Model>>
+        }
+        class Amenity {
+            <<Model>>
+        }
     }
 
     %% =======================
@@ -89,27 +101,9 @@ classDiagram
     %% =======================
     class Repository {
         <<Persistence>>
-        %% Manages data operations for models
     }
     class Database {
         <<Persistence>>
-        %% Stores application data
-    }
-
-    %% =======================
-    %% Models
-    %% =======================
-    class User {
-        <<Model>>
-    }
-    class Place {
-        <<Model>>
-    }
-    class Review {
-        <<Model>>
-    }
-    class Amenity {
-        <<Model>>
     }
 
     %% =======================
@@ -117,16 +111,14 @@ classDiagram
     %% =======================
     API --> HBNBFacade : Uses Facade
     Services --> HBNBFacade : Uses Facade
+
     HBNBFacade --> Repository : Interacts With
     Repository --> Database : Stores Data
 
-    %% Models connected to Repository
     Repository --> User : Manages
     Repository --> Place : Manages
     Repository --> Review : Manages
     Repository --> Amenity : Manages
-
-
 ```
 
 **Notes 💡**  
