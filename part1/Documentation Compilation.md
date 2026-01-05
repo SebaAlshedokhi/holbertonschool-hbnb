@@ -77,7 +77,7 @@ classDiagram
     %% =======================
     %% Business Logic Layer
     %% =======================
-    package "Business Logic Layer" {
+    namespace BusinessLogicLayer {
         class HBNBFacade {
             <<Facade>>
         }
@@ -119,6 +119,7 @@ classDiagram
     Repository --> Place : Manages
     Repository --> Review : Manages
     Repository --> Amenity : Manages
+
 ```
 
 **Notes 💡**  
