@@ -1,6 +1,6 @@
 from app.models.BaseEntity import BaseModel
 from app.models.place import Place
-
+from app.models.user import User
 
 class Review(BaseModel):
     def __init__(self, text, rating, place, user):
