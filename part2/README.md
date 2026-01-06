@@ -1,5 +1,13 @@
-In the README.md file, write a brief overview of the project setup:
+# HBnB Evolution – Part 2
 
-Describe the purpose of each directory and file.
+## 📌 Project Overview
 
-Include instructions on how to install dependencies and run the application.
+This project is part of the HBnB Evolution series and focuses on building the backend foundation of a simplified Airbnb-like application using Python.
+
+Part 2 introduces a layered architecture that separates concerns between models, services, persistence, and API layers. The goal is to create a clean, scalable structure that can later support real databases and RESTful APIs.
+
+---
+
+## 📂 Project Structure
+
+
