@@ -15,8 +15,7 @@ def create_app():
         title='HBnB API',
         description='HBnB Application API',
         doc='/api/v1/',
- api.add_namespace(places_ns, path='/api/v1/places')
-    )
+ api.add_namespace(places_ns, path='/api/v1/places'))
     
     # Register namespaces
     api.add_namespace(users_ns, path='/api/v1/users')
