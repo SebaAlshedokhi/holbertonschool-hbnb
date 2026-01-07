@@ -2,3 +2,7 @@ flask
 flask-restx
 email-validator
 pytest
+
+#pip install -r requirements.txt  to install things befor testing
+#python3 run.py  to Run app for testing
+#git pull origin main    for pulling from GitHub
