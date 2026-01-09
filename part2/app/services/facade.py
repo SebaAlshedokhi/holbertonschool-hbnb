@@ -35,8 +35,9 @@ class HBnBFacade:
         for key, value in user_data.items():
             setattr(user, key, value)
 
-        self.user_repo.update(user_id, user_data)
+        self.user_repo.update(user)
         return user
+
 
 
     # -------- AMENITY METHODS (Task 3) --------
