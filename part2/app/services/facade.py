@@ -1,164 +1,268 @@
-from app.persistence.repository import InMemoryRepository
-from app.models.user import User
-from app.models.amenity import Amenity
-from app.models.place import Place
+from hbnb.app.persistence.repository import InMemoryRepository
+from hbnb.app.models.user import User
+from hbnb.app.models.amenity import Amenity
+from hbnb.app.models.place import Place
+from hbnb.app.models.review import Review
 
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = SQLAlchemyRepository(User)  # Switched to SQLAlchemyRepository
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
+        self.user_repo = InMemoryRepository()
+        self.place_repo = InMemoryRepository()
+        self.review_repo = InMemoryRepository()
+        self.amenity_repo = InMemoryRepository()
 
-    # Placeholder method for creating a user
+    # ===== User Management Methods =====
+
     def create_user(self, user_data):
+        """Create a new user"""
         user = User(**user_data)
         self.user_repo.add(user)
         return user
 
     def get_user(self, user_id):
+        """Get a user by ID"""
         return self.user_repo.get(user_id)
 
-    def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
-
     def get_all_users(self):
+        """Get all users"""
         return self.user_repo.get_all()
 
+    def get_user_by_email(self, email):
+        """Get a user by email"""
+        return self.user_repo.get_by_attribute('email', email)
+
     def update_user(self, user_id, user_data):
+        """Update a user's information"""
         user = self.user_repo.get(user_id)
-        if user is None:
+        if not user:
             return None
 
-        for key, value in user_data.items():
-            setattr(user, key, value)
+        # Update user attributes
+        if 'first_name' in user_data:
+            user.first_name = user_data['first_name']
+        if 'last_name' in user_data:
+            user.last_name = user_data['last_name']
+        if 'email' in user_data:
+            user.email = user_data['email']
+        if 'is_admin' in user_data:
+            user.is_admin = user_data['is_admin']
 
-        self.user_repo.update(user)
+        # Validate the updated user
+        user.validate()
+        user.save()
+
+        # Update in repository
+        self.user_repo.update(user_id, user_data)
         return user
 
+    # ===== Place Management Methods =====
 
+    def create_place(self, place_data):
+        """Create a new place"""
+        # Get owner
+        owner = self.user_repo.get(place_data['owner_id'])
+        if not owner:
+            raise ValueError("Owner not found")
 
-    # -------- AMENITY METHODS (Task 3) --------
+        # Get amenities if provided
+        amenities = []
+        if 'amenities' in place_data and place_data['amenities']:
+            for amenity_id in place_data['amenities']:
+                amenity = self.amenity_repo.get(amenity_id)
+                if amenity:
+                    amenities.append(amenity)
+
+        # Create place with owner
+        place = Place(
+            title=place_data['title'],
+            description=place_data.get('description', ''),
+            price=place_data['price'],
+            latitude=place_data['latitude'],
+            longitude=place_data['longitude'],
+            owner=owner
+        )
+
+        # Add amenities
+        for amenity in amenities:
+            place.add_amenity(amenity)
+
+        self.place_repo.add(place)
+        return place
+
+    def get_place(self, place_id):
+        """Get a place by ID"""
+        return self.place_repo.get(place_id)
+
+    def get_all_places(self):
+        """Get all places"""
+        return self.place_repo.get_all()
+
+    def update_place(self, place_id, place_data):
+        """Update a place's information"""
+        place = self.place_repo.get(place_id)
+        if not place:
+            return None
+
+        # Update basic attributes
+        if 'title' in place_data:
+            place.title = place_data['title']
+        if 'description' in place_data:
+            place.description = place_data['description']
+        if 'price' in place_data:
+            place.price = place_data['price']
+        if 'latitude' in place_data:
+            place.latitude = place_data['latitude']
+        if 'longitude' in place_data:
+            place.longitude = place_data['longitude']
+
+        # Update owner if provided
+        if 'owner_id' in place_data:
+            owner = self.user_repo.get(place_data['owner_id'])
+            if not owner:
+                raise ValueError("Owner not found")
+            place.owner = owner
+
+        # Update amenities if provided
+        if 'amenities' in place_data:
+            place.amenities = []
+            for amenity_id in place_data['amenities']:
+                amenity = self.amenity_repo.get(amenity_id)
+                if amenity:
+                    place.add_amenity(amenity)
+
+        # Validate and save
+        place.validate()
+        place.save()
+
+        # Update in repository
+        self.place_repo.update(place_id, place_data)
+        return place
+
+    # ===== Amenity Management Methods =====
 
     def create_amenity(self, amenity_data):
+        """Create a new amenity"""
         amenity = Amenity(**amenity_data)
         self.amenity_repo.add(amenity)
         return amenity
 
     def get_amenity(self, amenity_id):
+        """Get an amenity by ID"""
         return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
+        """Get all amenities"""
         return self.amenity_repo.get_all()
 
+    def get_amenity_by_name(self, name):
+        """Get an amenity by name"""
+        return self.amenity_repo.get_by_attribute('name', name)
+
     def update_amenity(self, amenity_id, amenity_data):
+        """Update an amenity's information"""
         amenity = self.amenity_repo.get(amenity_id)
         if not amenity:
             return None
-        for key, value in amenity_data.items():
-            setattr(amenity, key, value)
-            
-        self.amenity_repo.update(amenity)
+
+        # Update amenity attributes
+        if 'name' in amenity_data:
+            amenity.name = amenity_data['name']
+
+        # Validate the updated amenity
+        amenity.validate()
+        amenity.save()
+
+        # Update in repository
+        self.amenity_repo.update(amenity_id, amenity_data)
         return amenity
 
+    # ===== Review Management Methods =====
 
-    # ----------- PLACE METHODS (Task 4) -----------
+    def create_review(self, review_data):
+        """Create a new review"""
+        # Get user
+        user = self.user_repo.get(review_data['user_id'])
+        if not user:
+            raise ValueError("User not found")
 
-    def create_place(self, place_data):
-        # Validate owner exists
-        owner_id = place_data.get("owner_id")
-        owner = self.user_repo.get(owner_id) if owner_id else None
-        if owner is None:
-            raise ValueError("Invalid owner_id")
+        # Get place
+        place = self.place_repo.get(review_data['place_id'])
+        if not place:
+            raise ValueError("Place not found")
 
-        # Validate amenities exist (optional field but if given must be valid)
-        amenities_ids = place_data.get("amenities", []) or []
-        amenities_objs = []
-        for amenity_id in amenities_ids:
-            amenity = self.amenity_repo.get(amenity_id)
-            if amenity is None:
-                raise ValueError("Invalid amenity_id")
-            amenities_objs.append(amenity)
-
-        # Validate numeric fields
-        price = place_data.get("price")
-        latitude = place_data.get("latitude")
-        longitude = place_data.get("longitude")
-
-        if price is None or price < 0:
-            raise ValueError("Invalid price")
-        if latitude is None or latitude < -90 or latitude > 90:
-            raise ValueError("Invalid latitude")
-        if longitude is None or longitude < -180 or longitude > 180:
-            raise ValueError("Invalid longitude")
-    
-        # Create place
-        place = Place(
-            title=place_data.get("title"),
-            description=place_data.get("description"),
-            price=price,
-            latitude=latitude,
-            longitude=longitude,
-            owner=owner
+        # Create review
+        review = Review(
+            text=review_data['text'],
+            rating=review_data['rating'],
+            user=user,
+            place=place
         )
 
-        # Attach amenities
-        for a in amenities_objs:
-            place.add_amenity(a)
+        self.review_repo.add(review)
+        return review
 
-        self.place_repo.add(place)
-        return place
+    def get_review(self, review_id):
+        """Get a review by ID"""
+        return self.review_repo.get(review_id)
 
+    def get_all_reviews(self):
+        """Get all reviews"""
+        return self.review_repo.get_all()
 
-    def get_place(self, place_id):
-        return self.place_repo.get(place_id)
-
-
-    def get_all_places(self):
-        return self.place_repo.get_all()
-
-
-    def update_place(self, place_id, place_data):
+    def get_reviews_by_place(self, place_id):
+        """Get all reviews for a specific place"""
         place = self.place_repo.get(place_id)
-        if place is None:
+        if not place:
+            return []
+        return place.reviews
+
+    def update_review(self, review_id, review_data):
+        """Update a review's information"""
+        review = self.review_repo.get(review_id)
+        if not review:
             return None
 
-        # Only update allowed fields
-        if "title" in place_data:
-            place.title = place_data["title"]
-        if "description" in place_data:
-            place.description = place_data["description"]
+        # Update basic attributes
+        if 'text' in review_data:
+            review.text = review_data['text']
+        if 'rating' in review_data:
+            review.rating = review_data['rating']
 
-        if "price" in place_data:
-            if place_data["price"] is None or place_data["price"] < 0:
-                raise ValueError("Invalid price")
-            place.price = place_data["price"]
+        # Update user if provided
+        if 'user_id' in review_data:
+            user = self.user_repo.get(review_data['user_id'])
+            if not user:
+                raise ValueError("User not found")
+            review.user = user
 
-        if "latitude" in place_data:
-            lat = place_data["latitude"]
-            if lat is None or lat < -90 or lat > 90:
-                raise ValueError("Invalid latitude")
-            place.latitude = lat
+        # Update place if provided
+        if 'place_id' in review_data:
+            place = self.place_repo.get(review_data['place_id'])
+            if not place:
+                raise ValueError("Place not found")
+            # Remove from old place's reviews
+            if review in review.place.reviews:
+                review.place.reviews.remove(review)
+            review.place = place
+            # Add to new place's reviews
+            place.add_review(review)
 
-        if "longitude" in place_data:
-            lon = place_data["longitude"]
-            if lon is None or lon < -180 or lon > 180:
-                raise ValueError("Invalid longitude")
-            place.longitude = lon
+        # Validate and save
+        review.validate()
+        review.save()
 
-        # Update amenities if provided
-        if "amenities" in place_data:
-            amenities_ids = place_data.get("amenities") or []
-            new_amenities = []
-            for amenity_id in amenities_ids:
-                amenity = self.amenity_repo.get(amenity_id)
-                if amenity is None:
-                    raise ValueError("Invalid amenity_id")
-                new_amenities.append(amenity)
-            place.amenities = []
-            for a in new_amenities:
-                place.add_amenity(a)
+        # Update in repository
+        self.review_repo.update(review_id, review_data)
+        return review
 
-        self.place_repo.update(place)
-        return place
+    def delete_review(self, review_id):
+        """Delete a review"""
+        review = self.review_repo.get(review_id)
+        if review:
+            # Remove from place's reviews list
+            if review in review.place.reviews:
+                review.place.reviews.remove(review)
+            self.review_repo.delete(review_id)
+            return True
+        return False
