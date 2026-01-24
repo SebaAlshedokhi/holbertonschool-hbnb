@@ -1,5 +1,0 @@
-flask
-flask-restx
-pytest
-pytest-cov
-requests
