@@ -4,3 +4,4 @@ pytest
 pytest-cov
 requests
 flask-bcrypt
+flask-jwt-extended
