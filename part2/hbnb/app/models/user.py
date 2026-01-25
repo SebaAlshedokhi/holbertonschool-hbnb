@@ -33,11 +33,14 @@ class User(BaseModel):
         self.is_admin = is_admin
         self.validate()
 
-    def hash_password(self, password):
+    def hash_password(self, password):    #take a plaintext password, hash it using bcrypt
     """Hashes the password before storing it."""
     self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    
+    def verify_password(self, password):   #compare a plaintext password with the hashed password
+    """Verifies if the provided password matches the hashed password."""
+    return bcrypt.check_password_hash(self.password, password)
+
     def validate(self) -> None:
         if not isinstance(self.first_name, str) or not self.first_name.strip():
             raise ValueError("first_name is required")
