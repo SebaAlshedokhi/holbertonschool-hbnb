@@ -27,4 +27,6 @@ def create_app(config.DevelopmentConfig):   #Update the create_app() method to r
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
 
+    bcrypt.init_app(app)   #Initialize the instance
+    
     return app
