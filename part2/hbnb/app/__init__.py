@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt  #Register the plugin within the Application
 bcrypt = Bcrypt() #Register the plugin within the Application
 
 
-def create_app(config.DevelopmentConfig):   #Update the create_app() method to receive a configuration
+def create_app(config_class="config.DevelopmentConfig"):   #Update the create_app() method to receive a configuration
     app = Flask(__name__)
     app.config.from_object(config_class)
     api = Api(
