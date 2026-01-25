@@ -3,3 +3,4 @@ flask-restx
 pytest
 pytest-cov
 requests
+flask-bcrypt
