@@ -52,16 +52,14 @@ class UserList(Resource):
         """Register a new user"""
         user_data = api.payload
 
-        # Check if email already exists
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
-            api.abort(409, 'Email already registered')
-
-        try:
-            new_user = facade.create_user(user_data)
-            return new_user, 201
-        except ValueError as e:
-            api.abort(400, str(e))
+            return {'error': 'Email already registered'}, 400
+        new_user = facade.create_user(user_data)
+        return {
+            'id': new_user.id,
+            'message': 'User successfully created'
+        }, 201   #update, return only id, message for client
 
 
 @api.route('/<string:user_id>')
