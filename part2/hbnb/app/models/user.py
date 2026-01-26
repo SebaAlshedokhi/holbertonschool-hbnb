@@ -2,20 +2,16 @@ from __future__ import annotations
 
 import re
 from typing import Any
-
+from flask_bcrypt import Bcrypt
 from hbnb.app.models.base_model import BaseModel
 
-
+bcrypt = Bcrypt()
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class User(BaseModel):
     """
-    User entity:
-    - first_name (required, max 50)
-    - last_name  (required, max 50)
-    - email      (required, valid format)
-    - is_admin   (bool, default False)
+    User entity
     """
 
     def __init__(
@@ -23,6 +19,7 @@ class User(BaseModel):
         first_name: str,
         last_name: str,
         email: str,
+        password: str = None,
         is_admin: bool = False,
         **kwargs: Any,
     ):
@@ -31,6 +28,11 @@ class User(BaseModel):
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
+
+        self.password = None
+        if password:
+            self.password = bcrypt.generate_password_hash(password).decode("utf-8")
+
         self.validate()
 
     def hash_password(self, password):    #take a plaintext password, hash it using bcrypt
@@ -39,6 +41,8 @@ class User(BaseModel):
 
     def verify_password(self, password):   #compare a plaintext password with the hashed password
     """Verifies if the provided password matches the hashed password."""
+    if not self.password:
+            return False
     return bcrypt.check_password_hash(self.password, password)
 
     def validate(self) -> None:
