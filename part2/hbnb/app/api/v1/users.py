@@ -3,6 +3,7 @@ User API endpoints for HBnB application
 """
 from flask_restx import Namespace, Resource, fields
 from hbnb.app.services.facade import HBnBFacade
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('users', description='User operations')
 
@@ -101,21 +102,26 @@ class UserResource(Resource):
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
     @api.response(400, 'Invalid input data')
-    @api.response(409, 'Email already registered')
+    @api.response(403, 'Unauthorized action')
+    
+    @jwt_required()
     def put(self, user_id):
         """Update user information"""
         user_data = api.payload
 
+        current_user_id = get_jwt_identity()
+        if user_id != current_user_id:
+            api.abort(403, 'Unauthorized action')
+
+        
         # Check if user exists
         existing_user = facade.get_user(user_id)
         if not existing_user:
             api.abort(404, 'User not found')
 
-        # Check if email is being changed to one that already exists
-        if 'email' in user_data and user_data['email'] != existing_user.email:
-            user_with_email = facade.get_user_by_email(user_data['email'])
-            if user_with_email:
-                api.abort(409, 'Email already registered')
+        # Prevent email or password modification
+        if 'email' in user_data or 'password' in user_data:
+            api.abort(400, 'You cannot modify email or password')
 
         # Update user fields
         updated_user = facade.update_user(user_id, user_data)
