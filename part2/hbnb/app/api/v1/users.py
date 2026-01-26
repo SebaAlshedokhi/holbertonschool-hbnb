@@ -40,7 +40,12 @@ class UserList(Resource):
     def get(self):
         """Get list of all users"""
         users = facade.get_all_users()
-        return users, 200
+        users_list = []
+        for user in users:
+            u = user.to_dict()
+            u.pop('password', None)  # Remove password before returning
+            users_list.append(u)
+        return users_list, 200
 
     @api.doc('create_user')
     @api.expect(user_model, validate=True)
@@ -55,11 +60,20 @@ class UserList(Resource):
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
+        
+        # Create user instance
         new_user = facade.create_user(user_data)
-        return {
-            'id': new_user.id,
-            'message': 'User successfully created'
-        }, 201   #update, return only id, message for client
+
+        # Hash the password before saving (inside User model or here)
+        new_user.hash_password(user_data['password'])
+
+        # Update user in repository after hashing
+        facade.user_repo.update(new_user)
+
+        # Prepare response without password
+        user_dict = new_user.to_dict()
+        user_dict.pop('password', None)
+        return user_dict, 201
 
 
 @api.route('/<string:user_id>')
@@ -76,7 +90,10 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             api.abort(404, 'User not found')
-        return user, 200
+        # Remove password before returning
+        user_dict = user.to_dict()
+        user_dict.pop('password', None)
+        return user_dict, 200
 
     @api.doc('update_user')
     @api.expect(user_model, validate=True)
@@ -100,8 +117,10 @@ class UserResource(Resource):
             if user_with_email:
                 api.abort(409, 'Email already registered')
 
-        try:
-            updated_user = facade.update_user(user_id, user_data)
-            return updated_user, 200
-        except ValueError as e:
-            api.abort(400, str(e))
+        # Update user fields
+        updated_user = facade.update_user(user_id, user_data)
+
+        # Remove password before returning
+        user_dict = updated_user.to_dict()
+        user_dict.pop('password', None)
+        return user_dict, 200
