@@ -7,3 +7,4 @@ flask-sqlalchemy
 pytest
 pytest-cov
 requests
+flask-cors
