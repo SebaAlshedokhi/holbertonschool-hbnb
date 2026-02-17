@@ -1,8 +1,6 @@
-// API Configuration
+
 const API_BASE_URL = 'http://127.0.0.1:5000/api/v1';
 
-// ==================== Cookie Helper Functions ====================
-// Check for the JWT token in cookies and redirect unauthenticated users.
 function checkAuthentication() {
       const token = getCookie('token');
       if (!token) {
@@ -26,25 +24,13 @@ function deleteCookie(name) {
     document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 }
 
-// ==================== Authentication ====================
+/////////// Authentication 
+/////////// Handles login, logout, and authentication token management
 
 function checkAuth() {
     const token = getCookie('token');
     const loginLink = document.getElementById('login-link');
 
-    /*if (loginLink) {
-        if (token) {
-            loginLink.textContent = 'Logout';
-            loginLink.href = '#';
-            loginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                logout();
-            });
-        } else {
-            loginLink.textContent = 'Login';
-            loginLink.href = 'login.html';
-        }
-    }*/
     if (!loginLink) return;
 
     if (!token) {
@@ -93,7 +79,7 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// ==================== Places ====================
+//  Places
 let allPlaces = [];
 
 async function fetchPlaces(country = '') {
@@ -130,13 +116,12 @@ async function fetchPlaces(country = '') {
     }
 }
 
-// Helper function to check if user is admin
 async function isUserAdmin() {
     const token = getCookie('token');
     if (!token) return false;
     
     try {
-        // Decode JWT token to get user info
+        
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload.is_admin || false;
     } catch (error) {
@@ -155,7 +140,7 @@ async function displayPlaces(places) {
         return;
     }
 
-    // Check if user is admin
+    
     const isAdmin = await isUserAdmin();
 
     places.forEach(place => {
@@ -163,7 +148,7 @@ async function displayPlaces(places) {
         card.className = 'place-card';
         card.setAttribute('data-price', place.price_per_night || place.price);
         
-        // Admin buttons HTML
+        
         const adminButtons = isAdmin ? `
             <div class="admin-buttons">
                 <button class="edit-btn" onclick="editPlace('${place.id}')">✏️ Edit</button>
@@ -183,7 +168,6 @@ async function displayPlaces(places) {
     });
 }
 
-// Function to get the right image for each place
 function getPlaceImage(title) {
     if (title.toLowerCase().includes('cozy')) {
         return 'cozy.jpg';
@@ -196,10 +180,9 @@ function getPlaceImage(title) {
     }
 }
 
-// Admin functions for Edit and Delete
+
 function editPlace(placeId) {
     alert(`Edit functionality for place ${placeId} - Coming soon!`);
-    // يمكن إضافة الكود الفعلي للتعديل لاحقاً
 }
 
 async function deletePlace(placeId) {
@@ -218,7 +201,7 @@ async function deletePlace(placeId) {
 
         if (response.ok) {
             alert('Place deleted successfully!');
-            fetchPlaces(); // Reload places
+            fetchPlaces(); 
         } else {
             const error = await response.json();
             alert(error.error || 'Failed to delete place');
@@ -251,7 +234,7 @@ function filterByPrice() {
         }
     });
 }
-// ==================== Place Details ====================
+//  Place Details 
 
 async function fetchPlaceDetails(placeId) {
     try {
@@ -284,7 +267,7 @@ function displayPlaceDetails(place) {
     const priceEl = document.getElementById('place-price');
     const locationEl = document.getElementById('place-location');
 
-    // بعض الـ APIs تستخدم name بدل title
+    
     const placeTitle = place.title || place.name || 'Place';
 
     if (titleEl) titleEl.textContent = placeTitle;
@@ -307,7 +290,6 @@ function displayPlaceDetails(place) {
         if (place.amenities && place.amenities.length > 0) {
             place.amenities.forEach(amenity => {
                 const li = document.createElement('li');
-                // amenity ممكن يكون string أو object
                 li.textContent = (typeof amenity === 'string') ? amenity : (amenity.name || 'Amenity');
                 amenitiesList.appendChild(li);
             });
@@ -319,7 +301,9 @@ function displayPlaceDetails(place) {
     displayReviews(place.reviews || []);
 }
 
-// ==================== Reviews ====================
+/////////// Reviews 
+// Handles review submission: validates user, sends POST request to API,
+// and refreshes place details after successful submission
 
 function displayReviews(reviews) {
     const reviewsList = document.getElementById('reviews-list');
@@ -348,7 +332,6 @@ async function addReview(event) {
 
     const token = checkAuthentication();
     
-    // Check if user is admin
     const isAdmin = await isUserAdmin();
     if (isAdmin) {
         alert('Admins cannot add reviews');
@@ -381,7 +364,7 @@ async function addReview(event) {
         if (response.ok) {
             alert('Review added successfully!');
             document.getElementById('review-form').reset();
-            // Reload place details to show new review
+
             fetchPlaceDetails(placeId);
         } else if (response.status === 401) {
             logout();
@@ -395,14 +378,12 @@ async function addReview(event) {
     }
 }
 
-// ==================== Filters ====================
 
 function filterByCountry() {
     const country = document.getElementById('country-filter').value;
     fetchPlaces(country);
 }
 
-// ==================== Page Initialization ====================
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
@@ -429,13 +410,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
     const urlParams = new URLSearchParams(window.location.search);
     const placeId = urlParams.get('id');
-
-    // Show Add Review form only if authenticated
-    /*const token = getCookie('token');
-    const addReviewSection = document.getElementById('add-review-btn');
-    if (addReviewSection) {
-        addReviewSection.style.display = token ? 'block' : 'none';
-    }*/
 
     if (placeId) {
         fetchPlaceDetails(placeId);
